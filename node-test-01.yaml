@@ -24,9 +24,10 @@ metadata:
   labels:
     name: nodetest
 spec:
+  type: LoadBalancer
   ports:
     # the port that this service should serve on
-  - port: 3000
+  - port: 80
     targetPort: 3000
   selector:
     name: nodetest
