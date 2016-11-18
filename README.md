@@ -1,6 +1,6 @@
 # Installing kubernetes in a docker container
 
-zreigz is awesome! Scroll down [this](https://github.com/kubernetes/kubernetes/issues/35712) post to see the detail instruction on how to create the image.
+zreigz is awesome! Scroll down [this](https://github.com/kubernetes/kubernetes/issues/35712) post to see the detail instruction on how to create the image. And scroll further to see how we can deploy a sample application.
 
 The only change I have made is I have added the commands to be executed in the container in a shell script and copied the same from the docker file. So, after you start and login the container you need to run the script as:
 
@@ -116,3 +116,83 @@ And finally you can execute
 Everything works the same like on local machine.
 Good luck :)
 
+## Deploying a sample application
+
+First, create a custom namespace where the application willl ve deployed.
+```
+$ kubectl create namespace my-app
+```
+Then, create the deployment yaml file which will be used for creating the application:
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nodetest-01
+  labels:
+    name: nodetest
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: nodetest
+    spec:
+      containers:
+      - name: nodetest-01
+        image: onlydevelop/node-test:0.1
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodetest-01
+  labels:
+    name: nodetest
+spec:
+  type: LoadBalancer
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 3000
+  selector:
+    name: nodetest
+```
+
+Please note the first section is for the Deployment and the second section is for the Service, which means exposing the application to outside. Few points which could be of interest:
+
+- `replicas` are number of instances running
+- `type LoadBalancer` tag creates a load balancer and automatically assigns a domain name for that.
+- `image` is the Docker image for the application - I used a sample image created [here](https://github.com/onlydevelop/docker-node)
+- `port` is which will be accessed from external and `targetPort` is the container port where the service is running.  
+
+Then, deploy the application using the following command:
+
+```
+$ kubectl apply -n  my-app -f "https://github.com/onlydevelop/kubeadm-docker/blob/master/node-test-01.yaml?raw=true"
+```
+
+Now, you can login to the dashboard and select the `namespace` as `my-app` and you can go to the `Services` link in the left panel and after a while you will see the external endpoint is available. Please give some time for the DNS to be propagated and then you will be able to see the app like this:
+
+```
+$ curl -i http://<your-endpoint>/user/dipanjan
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: text/html; charset=utf-8
+Content-Length: 48
+ETag: W/"30-3lzPh/kc2mUtq4TE59kDaQ"
+Date: Fri, 18 Nov 2016 11:48:40 GMT
+Connection: Keep-Alive
+Age: 0
+
+Hello dipanjan from nodetest-01-2756364007-5u5q8
+```
+
+which is the example App we have created [here](https://github.com/onlydevelop/docker-node)
+
+And finally, delete the application by the following command:
+
+```
+$ kubectl delete namespace my-app # create a custom namespace
+```
