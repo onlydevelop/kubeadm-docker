@@ -3,13 +3,13 @@ kind: Deployment
 metadata:
   name: nodetest-01
   labels:
-    name: nodetest-01
+    name: nodetest
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        name: nodetest-01
+        name: nodetest
     spec:
       containers:
       - name: nodetest-01
@@ -22,11 +22,11 @@ kind: Service
 metadata:
   name: nodetest-01
   labels:
-    name: nodetest-01
+    name: nodetest
 spec:
   ports:
     # the port that this service should serve on
   - port: 3000
     targetPort: 3000
   selector:
-	name: nodetest-01
+    name: nodetest
