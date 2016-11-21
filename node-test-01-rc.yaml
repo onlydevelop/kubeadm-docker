@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nodetest-01
+  labels:
+    name: nodetest
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: nodetest
+    spec:
+      containers:
+      - name: nodetest-01
+        image: onlydevelop/node-test:0.1
+        ports:
+        - containerPort: 3000

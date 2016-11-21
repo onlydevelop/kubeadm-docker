@@ -196,3 +196,52 @@ And finally, delete the application by the following command:
 ```
 $ kubectl delete namespace my-app # create a custom namespace
 ```
+
+## Creating a Replication controller
+
+We will create a replication controller first to with a sample size of 2
+
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nodetest-01
+  labels:
+    name: nodetest
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: nodetest
+    spec:
+      containers:
+      - name: nodetest-01
+        image: onlydevelop/node-test:0.1
+        ports:
+        - containerPort: 3000
+```
+
+And then, we will create the controller:
+
+```
+$ kubectl create -n my-app -f node-test-01-rc.yaml  
+$ kubectl get -n my-app rc
+
+NAME          DESIRED   CURRENT   READY     AGE
+nodetest-01   2         2         2         2m
+```
+
+You can check from the dashboard that the replication controller is created. 
+
+Then, scale the controller with replicas=3 and check if it increased:
+
+```
+$ kubectl scale rc -n my-app nodetest-01 --replicas=3
+$ kubectl get -n my-app rc
+
+NAME          DESIRED   CURRENT   READY     AGE
+nodetest-01   3         3         3         6m
+```
+
+
