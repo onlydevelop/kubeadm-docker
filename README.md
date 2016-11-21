@@ -244,4 +244,19 @@ NAME          DESIRED   CURRENT   READY     AGE
 nodetest-01   3         3         3         6m
 ```
 
+## Running a Rolling update
 
+Next, we will run a rolling update from version 0.1 to version 0.2 of the application. Meanwhile, we have updated the images with a small change. 
+
+```
+$ kubectl rolling-update -n my-app nodetest-01 --image=onlydevelop/node-test:0.2
+Created nodetest-01-e0791e9c30e789463122d4854aa31709
+Scaling up nodetest-01-e0791e9c30e789463122d4854aa31709 from 0 to 2, scaling down nodetest-01 from 2 to 0 (keep 2 pods available, don't exceed 3 pods)
+Scaling nodetest-01-e0791e9c30e789463122d4854aa31709 up to 1
+Scaling nodetest-01 down to 1
+Scaling nodetest-01-e0791e9c30e789463122d4854aa31709 up to 2
+Scaling nodetest-01 down to 0
+Update succeeded. Deleting old controller: nodetest-01
+Renaming nodetest-01 to nodetest-01-e0791e9c30e789463122d4854aa31709
+replicationcontroller "nodetest-01" rolling updated
+```
